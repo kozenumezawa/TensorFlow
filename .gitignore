@@ -1,3 +1,4 @@
 tutorial/MNIST_data/
 tutorial/mnist/
 tutorial/tensorflow_log
+*.local

@@ -2,26 +2,15 @@ from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
 
 import tensorflow as tf
+
 sess = tf.InteractiveSession()
 
-#   creating nodes
-x = tf.placeholder(tf.float32, shape=[None, 784])
-y_ = tf.placeholder(tf.float32, shape=[None, 10])
-
-# W is the weights and b is the biases
-W = tf.Variable(tf.zeros([784, 10]))
-b = tf.Variable(tf.zeros([10]))
-
-y = tf.nn.softmax(tf.matmul(x, W) + b)
-
-#   Initialize weights with a small amount of noise for symmetry breaking, and to prevent 0 gradients
-#   Since we're using ReLu neurons, it is also good practice to initialize
-#   them with a slightly positive initial bias
+#Initialize weights with a small amount of noise
 def weight_variable(shape):
     initial = tf.truncated_normal(shape, stddev=0.1)
     return tf.Variable(initial)
 
-
+#Initialize bias with a
 def bias_variable(shape):
     initial = tf.constant(0.1, shape=shape)
     return tf.Variable(initial)
@@ -37,7 +26,10 @@ def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                           strides=[1, 2, 2, 1], padding='SAME')
 
-W_conv1 = weight_variable([5, 5, 1, 32])
+x = tf.placeholder(tf.float32, shape=[None, 784])
+y_ = tf.placeholder(tf.float32, shape=[None, 10])
+
+W_conv1 = weight_variable([5, 5, 1, 32])    #   [width, height, input, filters]
 b_conv1 = bias_variable([32])
 
 #   To apply the layer, we first reshape x to a 4d tensor
@@ -45,7 +37,10 @@ b_conv1 = bias_variable([32])
 #   Final dimension correspoinding to the number of color channels
 x_image = tf.reshape(x, [-1, 28, 28, 1])
 
+#   Antivation: activation function in Relu(Rectified Linear Unit)
 h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
+
+#   Pooling: reduce dimensions  
 h_pool1 = max_pool_2x2(h_conv1)
 
 #   Second Convolutional Layer
@@ -75,17 +70,26 @@ y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
 #   Train and Evaluate the Model
 cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ *
                                               tf.log(y_conv), reduction_indices=[1]))
+
+tf.scalar_summary("x-entropy", cross_entropy)
+
 train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+
+#   Write placeholders in TensorBoard
+summary_writer = tf.train.SummaryWriter('tensorboard-mnist_data', graph_def=sess.graph_def)
+summary_op = tf.merge_all_summaries()
+
 sess.run(tf.initialize_all_variables())
-for i in range(20000):
+
+for i in range(2000):
     batch = mnist.train.next_batch(50)
     if i % 100 == 0:
         train_accuracy = accuracy.eval(
             feed_dict={x: batch[0], y_: batch[1], keep_prob: 1.0})
         print("step %d, training accuracy %g" % (i, train_accuracy))
+        summary_str = sess.run(summary_op, feed_dict={x: batch[0], y_: batch[1], keep_prob: 1.0})
+        summary_writer.add_summary(summary_str, i)
     train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
-
-print("test accuracy %g" % accuracy.eval(feed_dict={
-    x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
