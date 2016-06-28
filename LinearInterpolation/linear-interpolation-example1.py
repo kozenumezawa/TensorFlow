@@ -14,18 +14,18 @@ def inference(input_placeholder):
         b = tf.Variable(tf.zeros([2]), name="bias")      # b = [dimenstion(2)]
 
         y = tf.nn.softmax(tf.matmul(input_placeholder, W) + b)
-    return y
+        return y
 
 def loss(output, supervisor_labels_placeholder):
     with tf.name_scope('loss') as scope:
         cross_entropy = -tf.reduce_sum(supervisor_labels_placeholder * tf.log(output))
         tf.scalar_summary("x-entropy", cross_entropy)
-    return cross_entropy
+        return cross_entropy
 
 def training(loss):
     with tf.name_scope('training') as scope:
         train_step = tf.train.GradientDescentOptimizer(0.01).minimize(loss)
-    return train_step
+        return train_step
 
 #   Variables are defined here to write variables in TensorBoard
 with tf.Graph().as_default():
