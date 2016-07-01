@@ -27,7 +27,24 @@ def max_pool_2x2(x):
         return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                           strides=[1, 2, 2, 1], padding='SAME')
 
+#   Train and Evaluate the Model
+def cross_entropy(y_, y_conv):
+    with tf.name_scope('error') as scope:
+        cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ *
+                                                      tf.log(y_conv), reduction_indices=[1]))
+        return cross_entropy
 
+def trainning(cross_entropy):
+    with tf.name_scope('trainning') as scope:
+        return tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+
+def accuracy(y_conv, y_):
+    with tf.name_scope('accuracy') as scope:
+        correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+        return accuracy
+
+        
 x = tf.placeholder(tf.float32, shape=[None, 784], name='input')
 y_ = tf.placeholder(tf.float32, shape=[None, 10], name='output')
 
@@ -70,25 +87,10 @@ W_fc2 = weight_variable([1024, 10], "W_fc2")
 b_fc2 = bias_variable([10], "b_fc2")
 y_conv = tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
 
-#   Train and Evaluate the Model
-def cross_entropy(y_, y_conv):
-    with tf.name_scope('error') as scope:
-        cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ *
-                                                      tf.log(y_conv), reduction_indices=[1]))
-        return cross_entropy
 
 cross_entropy = cross_entropy(y_, y_conv)
 
-def trainning(cross_entropy):
-    with tf.name_scope('trainning') as scope:
-        return tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
 train_step = trainning(cross_entropy)
-
-def accuracy(y_conv, y_):
-    with tf.name_scope('accuracy') as scope:
-        correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
-        accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-        return accuracy
 
 accuracy = accuracy(y_conv, y_)
 
