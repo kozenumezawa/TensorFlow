@@ -31,7 +31,7 @@ sess = tf.Session()
 sess.run(init)
 
 #   グラフのデータをTensorBoardに書き込む
-summary_writer = tf.train.SummaryWriter('mnist1_data', graph_def=sess.graph_def)
+summary_writer = tf.summary.FileWriter('mnist1_data', graph=sess.graph)
 
 #   1000回学習させる
 for i in range(1000):
