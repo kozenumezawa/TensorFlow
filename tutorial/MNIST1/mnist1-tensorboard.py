@@ -23,7 +23,7 @@ with tf.name_scope("training") as scope:
     train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
 
 #   すべての変数を初期化する準備
-init = tf.initialize_all_variables()
+init = tf.global_variables_initializer()
 
 #   Sessionを初期化して開始
 #   Sessionが、上で定義したNNのグラフ（placeholderとvariableの接続関係）と計算資源（CPU・GPU）をつないでくれる
