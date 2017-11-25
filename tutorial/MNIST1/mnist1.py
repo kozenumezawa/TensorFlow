@@ -47,4 +47,4 @@ correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
 #   これを0(False),1(True)に対応付けて、その平均値を計算
 accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
-print(sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
+print(sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
