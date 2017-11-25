@@ -14,12 +14,12 @@ y = tf.nn.softmax(tf.matmul(x, W) + b)
 y_ = tf.placeholder(tf.float32, [None, 10], name="y_")
 
 #   クロスエントロピーの計算をname_scopeでまとめる
-with tf.name_scope("cross-entropy") as scope:
+with tf.name_scope("cross-entropy"):
     cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
 
 
 #   最急降下法の計算をname_scopeでまとめる
-with tf.name_scope("training") as scope:
+with tf.name_scope("training"):
     train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
 
 #   すべての変数を初期化する準備
@@ -31,7 +31,7 @@ sess = tf.Session()
 sess.run(init)
 
 #   グラフのデータをTensorBoardに書き込む
-summary_writer = tf.summary.FileWriter('mnist1_data', graph=sess.graph)
+summary_writer = tf.summary.FileWriter('./mnist1_data', graph=sess.graph)
 
 #   1000回学習させる
 for i in range(1000):
